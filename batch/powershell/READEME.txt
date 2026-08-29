@@ -1,0 +1,32 @@
+# 📂 Automated Video File Organizer & Transfer Tool (PowerShell + Batch)
+
+Solução automatizada em PowerShell acoplada a um acionador Batch para triagem, mapeamento de nomes por expressões regulares (Regex) e movimentação de mídias brutas para estruturas de pastas compartilhadas (OneDrive/SharePoint/Servidor).
+
+---
+
+## 🛠️ O Problema e a Solução
+
+* **Desafio:** A triagem manual de dezenas de arquivos de mídia recebidos e o redirecionamento para pastas de unidades operacionais consome tempo e está sujeito a erros de alocação ou perda de arquivos.
+* **Solução:** O script identifica o diretório de origem via `$MyInvocation`, mapeia as pastas do repositório de destino, normaliza a nomenclatura das pastas (removendo prefixos e numerações com Regex) e realiza a transferência assíncrona, gerando um log de auditoria ao final (`relatorio_envio.txt`).
+
+---
+
+## ⚙️ Destaques Técnicos e Arquitetura
+
+### 1. Regex e Normalização de Strings (`-replace '^\d+\s+', ''`)
+* Trata nomes de diretórios que contêm códigos numéricos operacionais (ex: `"398 UNIDADE NORTE"`), isolando o identificador textual (`"UNIDADE NORTE"`) para correspondência flexível com os arquivos.
+
+### 2. Tratamento de Erros e Logs de Auditoria (`Try-Catch`)
+* Encapsula a operação de movimentação (`Move-Item`) em blocos `Try/Catch`. Em caso de arquivos bloqueados ou falhas de permissão de rede, o script registra a exceção em vermelho no terminal e grava o erro detalhado no arquivo de log sem interromper a execução dos demais arquivos.
+
+### 3. Acionador Automático (`Bypass Execution Policy`)
+* O arquivo `.bat` utiliza `%~dp0` para resolver o caminho relativo atual e aplica `-ExecutionPolicy Bypass`, permitindo que operadores sem privilégios avançados de PowerShell executem a automação via duplo clique.
+
+---
+
+## 💻 Como Configurar e Utilizar
+
+1. Abra o arquivo `Organizar_Mover_Videos.ps1` e ajuste a variável `$dest` com o caminho da sua pasta de destino.
+2. Coloque o script `.ps1` e o `.bat` na pasta onde os vídeos brutos são baixados.
+3. Dê um duplo clique no arquivo `Executar_Organizador.bat`.
+4. Ao final da execução, verifique o arquivo `relatorio_envio.txt` gerado no mesmo diretório para conferir o status das movimentações.
