@@ -1,0 +1,40 @@
+# 📹 Smart Video Occurrence & Task Counter (Batch + PowerShell)
+
+Script utilitário em linha de comando híbrida (CMD Batch e PowerShell inline) projetado para filtrar registros de mídias de monitoramento, desduplicar canais de gravação e consolidar pendências operacionais em tempo real.
+
+---
+
+## 🛠️ O Problema e a Solução
+
+* **Desafio:** Sistemas de CFTV e gravação de vídeo frequentemente dividem o mesmo evento em múltiplos arquivos referentes a diferentes ângulos/canais de câmera (`CH1`, `CH2`, `CH3`, `CH4`). Uma contagem simples de arquivos via Windows Explorer resulta em contagem duplicada ou quadruplicada de uma mesma ocorrência.
+* **Solução:** O script executa uma filtragem em PowerShell que contabiliza apenas os arquivos do canal principal (`CH1`) ou arquivos sem marcadores de canal, ignorando os ângulos secundários para obter a contagem real de ocorrências únicas. Em seguida, solicita as pendências por operador/estação e gera o balanço consolidado.
+
+---
+
+## ⚙️ Funcionalidades Técnicas
+
+### 1. Invocação Inline do PowerShell (`for /f`)
+* Executa comandos PowerShell diretamente pelo terminal CMD sem criar dependências de arquivos `.ps1` externos temporários na máquina.
+
+### 2. Filtragem de Canais por Expressão Regular
+* **Inclusão do Canal Principal:** `Name -match 'CH1'` garante a contabilização da tomada primária.
+* **Fallback para Arquivos Sem Marcador:** `Name -notmatch 'CH1|CH2|CH3|CH4'` assegura que vídeos sem convenção padrão de canal não sejam descartados da contagem.
+* **Exclusão de Scripts:** Descarta o próprio arquivo `.bat` do cálculo.
+
+### 3. Tratamento Resiliente de Entradas (`Prompt Sanitization`)
+* Captura interativa via `set /p` tratada com blocos condicionais `if "%VAR%"=="" set VAR=0`, prevenindo erros de cálculo numérico no comando `set /a` caso o operador apenas pressione `ENTER`.
+
+---
+
+## 💻 Como Utilizar
+
+1. Coloque o arquivo `Contador_OCs_Videos.bat` no diretório raiz onde estão salvos os vídeos de monitoramento.
+2. Execute o script via prompt de comando ou com duplo clique.
+3. Insira as pendências individuais de cada operador/estação conforme solicitado.
+4. Visualize o relatório final contendo **OCs em Mídia**, **OCs Pendentes** e o **Total Geral Consolidado**.
+
+---
+
+## 📋 Pré-requisitos
+* **Ambiente:** Windows 10, 11 ou Windows Server.
+* **Dependência:** Windows PowerShell 5.1+ (nativo no sistema).
